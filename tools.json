@@ -20,5 +20,60 @@
     "author": "yangdujun",
     "version": "1.0.0",
     "tags": ["辅助", "缩放", "计算器", "分辨率", "分辨率缩放计算器"]
+  },
+  {
+    "id": 3,
+    "name": "秋葉的一键启动器",
+    "description": "图形化管理界面简化ComfyUI安装与更新，避免官方整合包代码报错，方便下载节点插件，适合新手使用",
+    "category": "utils",
+    "icon": "fa-rocket",
+    "version": "随更新迭代",
+    "author": "秋葉aaaki",
+    "url": "https://www.bilibili.com/opus/897873624905547794",
+    "tags": ["启动器", "新手友好", "整合包管理"]
+  },
+  {
+    "id": 4,
+    "name": "ComfyUI管理大师",
+    "description": "支持Windows系统，具备启动器、插件管理、环境依赖管理、工作流分析等功能，可一键启动/关闭ComfyUI，通过国内镜像加速下载，解决节点爆红问题",
+    "category": "utils",
+    "icon": "fa-cogs",
+    "version": "随更新迭代",
+    "author": "AI搅拌手",
+    "url": "https://www.bilibili.com/video/BV1XQokY4Ed3/",
+    "tags": ["管理工具", "依赖管理", "国内加速"]
+  },
+  {
+    "id": 5,
+    "name": "ComfyUI Manager",
+    "description": "节点管理器，可在线安装插件，扩展ComfyUI功能，覆盖图像修复、风格迁移等复杂需求",
+    "category": "nodes",
+    "icon": "fa-puzzle-piece",
+    "version": "3.35(Jul 25, 2025, 6:03 AM GMT+8)",
+    "author": "ltdrdata",
+    "url": "https://github.com/ltdrdata/ComfyUI-Manager",
+    "tags": ["节点管理", "插件安装", "功能扩展"]
+  },
+  {
+    "id": 6,
+    "name": "AIGODLIKE - ComfyUI - Translation",
+    "description": "中文翻译插件，非整合包的ComfyUI可通过安装该插件实现语言切换，方便中文用户使用",
+    "category": "nodes",
+    "icon": "fa-language",
+    "version": "随更新迭代",
+    "author": "AIGODLIKE",
+    "url": "https://github.com/AIGODLIKE/ComfyUI-Translation",
+    "tags": ["中文翻译", "语言切换", "本地化"]
+  },
+  {
+    "id": 7,
+    "name": "comfyworkflows",
+    "description": "第三方工作流平台，提供大量现成的ComfyUI工作流模板，用户可直接下载使用，加速学习曲线",
+    "category": "presets",
+    "icon": "fa-sitemap",
+    "version": "平台型工具",
+    "author": "平台型工具",
+    "url": "https://comfyworkflows.com/",
+    "tags": ["工作流模板", "资源平台", "快速上手"]
   }
 ]
