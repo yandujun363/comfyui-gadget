@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>分辨率缩放计算器</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="sd-resizer.svg" type="image/svg+xml">
+    <link rel="icon" href="sd-resizer.svg" type="image/svg+xml" />
     <link
       href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
       rel="stylesheet"
@@ -120,6 +120,7 @@
               type="checkbox"
               id="align8"
               class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              checked
             />
             <span class="ml-2 text-sm text-gray-700">对齐到8的倍数</span>
           </label>
@@ -185,6 +186,21 @@
       function alignTo8(value) {
         return Math.ceil(value / 8) * 8;
       }
+
+      // 监听对齐到8的倍数选项变化
+      align8.addEventListener("change", function () {
+        // 如果勾选了对齐到8的倍数，则禁用保留整数选项
+        if (this.checked) {
+          roundInteger.checked = false;
+          roundInteger.disabled = true;
+        } else {
+          // 否则启用保留整数选项
+          roundInteger.disabled = false;
+        }
+      });
+
+      // 初始设置：因为默认勾选了对齐到8的倍数，所以禁用保留整数
+      roundInteger.disabled = true;
 
       // 计算分辨率
       function calculateResolution() {
