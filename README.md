@@ -17,6 +17,10 @@ ComfyUI作为一款强大的AI图像生成工具，拥有丰富的扩展生态�
 
 ![ComfyUI工具导航预览](screenshot.png)
 
+## 访问链接
+
+[ComfyUI工具导航](https://comfyui-gadget.yangdujun.work/)
+
 ## 如何贡献
 
 目前项目处于初期阶段，非常需要社区的帮助来收集和补充ComfyUI相关工具。您可以通过以下方式贡献：
