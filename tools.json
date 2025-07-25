@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "SD\\SDXL 分辨率放大器",
+    "description": "这个网页应用可以帮助您计算图像在不同放大倍数下的分辨率，特别适用于Stable Diffusion和Stable Diffusion XL等AI绘图工具。它提供了常用的预设分辨率，并支持自定义输入和放大倍数调整，确保计算结果符合8的倍数要求，这是许多AI绘图工具处理图像时的必要条件。",
+    "category": "utils",
+    "icon": "fa-search-plus",
+    "url": "/sd-res-zoom-calculator.html",
+    "author": "yangdujun",
+    "version": "1.0.0",
+    "tags": ["辅助", "放大", "计算器", "分辨率", "SD\\SDXL 分辨率放大器"]
+  },
+  {
+    "id": 2,
+    "name": "分辨率缩放计算器",
+    "description": "它能根据原始图像分辨率，按照固定比例自动计算缩放后的尺寸，帮你快速得到精确的目标分辨率。支持两种实用模式：保留整数结果或自动对齐到 8 的倍数，满足不同模型对输入尺寸的要求。",
+    "category": "utils",
+    "icon": "fa-calculator",
+    "url": "/sd-resizer.html",
+    "author": "yangdujun",
+    "version": "1.0.0",
+    "tags": ["辅助", "缩放", "计算器", "分辨率", "分辨率缩放计算器"]
+  }
+]

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ComfyUI工具导航</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome图标 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- 配置Tailwind自定义主题 -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#8B5CF6", // 紫色作为主色调，符合创意工具氛围
+              secondary: "#10B981", // 绿色作为辅助色，表示功能和运行
+              dark: "#1E1B4B",
+              darker: "#0F172A",
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+        .tool-card-hover {
+          @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-darker to-dark text-gray-100 min-h-screen"
+  >
+    <!-- 顶部导航栏 -->
+    <header
+      class="sticky top-0 z-50 bg-darker/80 backdrop-blur-md border-b border-primary/20"
+    >
+      <div
+        class="container mx-auto px-4 py-3 flex justify-between items-center"
+      >
+        <div class="flex items-center space-x-2">
+          <i class="fa fa-cubes text-primary text-2xl"></i>
+          <h1
+            class="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+          >
+            ComfyUI工具导航
+          </h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button
+            id="refreshBtn"
+            class="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+          >
+            <i class="fa fa-refresh"></i>
+            <span class="hidden sm:inline">刷新</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- 搜索和分类 -->
+      <div
+        class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+      >
+        <div class="relative w-full md:w-64">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="搜索工具..."
+            class="w-full px-4 py-2 pl-10 rounded-lg bg-gray-800/50 border border-gray-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+          />
+          <i
+            class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          ></i>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="category-btn active px-4 py-1.5 rounded-full bg-primary text-white"
+            data-category="all"
+          >
+            全部
+          </button>
+          <button
+            class="category-btn px-4 py-1.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+            data-category="nodes"
+          >
+            节点工具
+          </button>
+          <button
+            class="category-btn px-4 py-1.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+            data-category="scripts"
+          >
+            脚本工具
+          </button>
+          <button
+            class="category-btn px-4 py-1.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+            data-category="presets"
+          >
+            预设模板
+          </button>
+          <button
+            class="category-btn px-4 py-1.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors"
+            data-category="utils"
+          >
+            辅助工具
+          </button>
+        </div>
+      </div>
+
+      <!-- 工具列表 -->
+      <div
+        id="toolsContainer"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <!-- 工具卡片将通过JS动态加载 -->
+        <div
+          id="loadingIndicator"
+          class="col-span-full flex flex-col items-center justify-center py-16"
+        >
+          <div
+            class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"
+          ></div>
+          <p class="text-gray-400">加载工具列表中...</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 工具详情模态框 -->
+    <div
+      id="toolModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        id="modalOverlay"
+      ></div>
+      <div
+        class="relative bg-darker rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-gray-800"
+      >
+        <button
+          id="closeModal"
+          class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 transition-colors z-10"
+        >
+          <i class="fa fa-times"></i>
+        </button>
+        <div class="p-6" id="modalContent">
+          <!-- 模态框内容将通过JS动态填充 -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 工具数据
+      let toolsData = [];
+
+      // DOM元素加载完成后执行
+      document.addEventListener("DOMContentLoaded", function () {
+        // 加载工具数据
+        loadToolsData();
+
+        // 绑定事件监听
+        bindEventListeners();
+      });
+
+      // 加载工具数据
+      function loadToolsData() {
+        // 显示加载状态
+        document.getElementById("toolsContainer").innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-16">
+          <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p class="text-gray-400">加载工具列表中...</p>
+        </div>
+      `;
+        fetch("tools.json")
+          .then((response) => response.json())
+          .then((data) => {
+            toolsData = data;
+            renderTools();
+          })
+          .catch((error) => {
+            showError("加载工具数据失败，请稍后重试");
+            console.error("Error loading tools data:", error);
+          });
+      }
+
+      // 渲染工具列表
+      function renderTools(filteredTools = null) {
+        const container = document.getElementById("toolsContainer");
+        const toolsToRender = filteredTools || toolsData;
+
+        if (toolsToRender.length === 0) {
+          container.innerHTML = `
+          <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+            <i class="fa fa-search text-4xl text-gray-600 mb-4"></i>
+            <h3 class="text-xl font-medium mb-2">未找到匹配的工具</h3>
+            <p class="text-gray-500 max-w-md">尝试使用不同的搜索关键词或分类筛选</p>
+          </div>
+        `;
+          return;
+        }
+
+        // 生成工具卡片HTML
+        container.innerHTML = toolsToRender
+          .map(
+            (tool) => `
+        <div class="tool-card bg-gray-800/30 rounded-xl overflow-hidden border border-gray-700/50 tool-card-hover cursor-pointer" data-id="${
+          tool.id
+        }">
+          <div class="p-5">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/20 text-primary">
+                <i class="fa ${tool.icon} text-xl"></i>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-${getCategoryColor(
+                tool.category
+              )}/20 text-${getCategoryColor(tool.category)}">
+                ${getCategoryName(tool.category)}
+              </span>
+            </div>
+            <h3 class="text-lg font-semibold mb-2 line-clamp-1">${
+              tool.name
+            }</h3>
+            <p class="text-gray-400 text-sm mb-4 line-clamp-2">${
+              tool.description
+            }</p>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-500">v${tool.version}</span>
+              <button class="text-primary hover:text-primary/80 text-sm font-medium transition-colors">
+                查看详情
+              </button>
+            </div>
+          </div>
+        </div>
+      `
+          )
+          .join("");
+
+        // 为工具卡片添加点击事件
+        document.querySelectorAll(".tool-card").forEach((card) => {
+          card.addEventListener("click", function () {
+            const toolId = parseInt(this.getAttribute("data-id"));
+            showToolDetails(toolId);
+          });
+        });
+      }
+
+      // 获取分类对应的颜色
+      function getCategoryColor(category) {
+        const colors = {
+          nodes: "primary",
+          scripts: "blue",
+          presets: "secondary",
+          utils: "purple",
+        };
+        return colors[category] || "gray";
+      }
+
+      // 获取分类的显示名称
+      function getCategoryName(category) {
+        const names = {
+          nodes: "节点工具",
+          scripts: "脚本工具",
+          presets: "预设模板",
+          utils: "辅助工具",
+        };
+        return names[category] || category;
+      }
+
+      // 显示工具详情
+      function showToolDetails(toolId) {
+        const tool = toolsData.find((t) => t.id === toolId);
+        if (!tool) return;
+
+        const modalContent = document.getElementById("modalContent");
+        modalContent.innerHTML = `
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 rounded-lg flex items-center justify-center bg-primary/20 text-primary mx-auto mb-4">
+            <i class="fa ${tool.icon} text-2xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-1">${tool.name}</h2>
+          <p class="text-gray-400">${tool.description}</p>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="bg-gray-800/50 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-gray-400 mb-2">基本信息</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">分类</span>
+                <span class="font-medium">${getCategoryName(
+                  tool.category
+                )}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">作者</span>
+                <span class="font-medium">${tool.author}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">版本</span>
+                <span class="font-medium">v${tool.version}</span>
+              </div>
+            </div>
+          </div>
+          
+          ${
+            tool.tags && tool.tags.length > 0
+              ? `
+            <div>
+              <h3 class="text-sm font-medium text-gray-400 mb-2">标签</h3>
+              <div class="flex flex-wrap gap-2">
+                ${tool.tags
+                  .map(
+                    (tag) => `
+                  <span class="px-2.5 py-0.5 rounded-full text-xs bg-gray-800">${tag}</span>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `
+              : ""
+          }
+          
+          <div class="pt-4 border-t border-gray-800 flex justify-between">
+            <a href="${
+              tool.url
+            }" target="_blank" class="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium transition-colors flex-1 mr-2 text-center">
+              打开工具
+            </a>
+          </div>
+        </div>
+      `;
+
+        // 显示模态框
+        document.getElementById("toolModal").classList.remove("hidden");
+      }
+
+      // 绑定事件监听器
+      function bindEventListeners() {
+        // 搜索功能
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", function () {
+          const searchTerm = this.value.toLowerCase().trim();
+          const activeCategory = document
+            .querySelector(".category-btn.active")
+            .getAttribute("data-category");
+
+          filterTools(searchTerm, activeCategory);
+        });
+
+        // 分类筛选
+        const categoryBtns = document.querySelectorAll(".category-btn");
+        categoryBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            // 更新活跃状态
+            categoryBtns.forEach((b) => {
+              b.classList.remove("active", "bg-primary", "text-white");
+              b.classList.add("bg-gray-800/50", "hover:bg-gray-700/50");
+            });
+            this.classList.add("active", "bg-primary", "text-white");
+            this.classList.remove("bg-gray-800/50", "hover:bg-gray-700/50");
+
+            // 筛选工具
+            const category = this.getAttribute("data-category");
+            const searchTerm = document
+              .getElementById("searchInput")
+              .value.toLowerCase()
+              .trim();
+
+            filterTools(searchTerm, category);
+          });
+        });
+
+        // 刷新按钮
+        document
+          .getElementById("refreshBtn")
+          .addEventListener("click", function () {
+            // 添加旋转动画
+            this.querySelector("i").classList.add("animate-spin");
+            loadToolsData();
+
+            // 1秒后移除旋转动画
+            setTimeout(() => {
+              this.querySelector("i").classList.remove("animate-spin");
+            }, 1000);
+          });
+
+        // 模态框关闭按钮
+        document
+          .getElementById("closeModal")
+          .addEventListener("click", function () {
+            document.getElementById("toolModal").classList.add("hidden");
+          });
+
+        // 点击模态框背景关闭
+        document
+          .getElementById("modalOverlay")
+          .addEventListener("click", function () {
+            document.getElementById("toolModal").classList.add("hidden");
+          });
+
+        // 按ESC键关闭模态框
+        document.addEventListener("keydown", function (e) {
+          if (
+            e.key === "Escape" &&
+            !document.getElementById("toolModal").classList.contains("hidden")
+          ) {
+            document.getElementById("toolModal").classList.add("hidden");
+          }
+        });
+      }
+
+      // 筛选工具
+      function filterTools(searchTerm, category) {
+        let filtered = toolsData;
+
+        // 按分类筛选
+        if (category !== "all") {
+          filtered = filtered.filter((tool) => tool.category === category);
+        }
+
+        // 按搜索词筛选
+        if (searchTerm) {
+          filtered = filtered.filter((tool) => {
+            return (
+              tool.name.toLowerCase().includes(searchTerm) ||
+              tool.description.toLowerCase().includes(searchTerm) ||
+              (tool.tags &&
+                tool.tags.some((tag) => tag.toLowerCase().includes(searchTerm)))
+            );
+          });
+        }
+
+        // 渲染筛选结果
+        renderTools(filtered);
+      }
+
+      // 显示错误信息
+      function showError(message) {
+        const container = document.getElementById("toolsContainer");
+        container.innerHTML = `
+        <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+          <i class="fa fa-exclamation-triangle text-yellow-500 text-4xl mb-4"></i>
+          <h3 class="text-xl font-medium mb-2">加载失败</h3>
+          <p class="text-gray-400 max-w-md">${message}</p>
+          <button id="retryBtn" class="mt-4 px-4 py-2 bg-primary hover:bg-primary/90 rounded-lg transition-colors">
+            重试
+          </button>
+        </div>
+      `;
+
+        // 重试按钮事件
+        document
+          .getElementById("retryBtn")
+          .addEventListener("click", loadToolsData);
+      }
+    </script>
+  </body>
+</html>

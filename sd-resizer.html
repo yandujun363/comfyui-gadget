@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>分辨率缩放计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="sd-resizer.svg" type="image/svg+xml">
+    <link
+      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3b82f6",
+              secondary: "#10b981",
+              neutral: "#64748b",
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .card-shadow {
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .input-focus {
+          @apply focus:ring-2 focus:ring-primary/50 focus:border-primary;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen py-10 px-4 md:px-0">
+    <div class="max-w-2xl mx-auto bg-white rounded-xl p-6 md:p-8 card-shadow">
+      <h1
+        class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-6 text-center"
+      >
+        <i class="fa fa-calculator text-primary mr-2"></i>分辨率缩放计算器
+      </h1>
+      <p class="text-neutral mb-8 text-center">
+        用于计算按比例缩小的图片分辨率，适配ComfyUI等场景
+      </p>
+
+      <div class="space-y-6">
+        <!-- 输入分辨率 -->
+        <div>
+          <label
+            for="inputResolution"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >输入分辨率</label
+          >
+          <div class="flex items-center space-x-2">
+            <input
+              type="number"
+              id="inputWidth"
+              placeholder="宽度"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all"
+            />
+            <span class="text-gray-500 text-xl font-bold">×</span>
+            <input
+              type="number"
+              id="inputHeight"
+              placeholder="高度"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all"
+            />
+          </div>
+          <p class="text-xs text-gray-500 mt-1">例如：1824 × 1080</p>
+        </div>
+
+        <!-- 输出设置 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >输出设置</label
+          >
+          <div class="flex items-center space-x-2">
+            <input
+              type="number"
+              id="outputFixed"
+              placeholder="固定值"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all"
+            />
+            <div
+              class="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-gray-50"
+            >
+              <span class="text-gray-500">×</span>
+              <select
+                id="outputDimension"
+                class="ml-2 bg-transparent border-none focus:ring-0"
+              >
+                <option value="height">x (计算高度)</option>
+                <option value="width">y (计算宽度)</option>
+              </select>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            例如：512 × x (固定宽度，计算高度)
+          </p>
+        </div>
+
+        <!-- 选项设置 -->
+        <div class="flex flex-wrap gap-4 pt-2">
+          <label class="inline-flex items-center">
+            <input
+              type="checkbox"
+              id="roundInteger"
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+            />
+            <span class="ml-2 text-sm text-gray-700">保留整数</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input
+              type="checkbox"
+              id="align8"
+              class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+            />
+            <span class="ml-2 text-sm text-gray-700">对齐到8的倍数</span>
+          </label>
+        </div>
+
+        <!-- 计算按钮 -->
+        <button
+          id="calculateBtn"
+          class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center"
+        >
+          <i class="fa fa-refresh mr-2"></i>计算缩放分辨率
+        </button>
+
+        <!-- 结果显示 -->
+        <div
+          id="resultContainer"
+          class="hidden mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200"
+        >
+          <h3 class="text-sm font-medium text-gray-700 mb-2">计算结果</h3>
+          <div
+            class="flex items-center justify-center p-4 bg-white rounded border border-gray-100"
+          >
+            <span id="resultWidth" class="text-2xl font-bold text-gray-800"
+              >0</span
+            >
+            <span class="text-xl text-gray-500 mx-2">×</span>
+            <span id="resultHeight" class="text-2xl font-bold text-gray-800"
+              >0</span
+            >
+          </div>
+          <div class="mt-3 text-sm text-gray-600">
+            <p>
+              原始比例: <span id="originalRatio" class="font-medium"></span>
+            </p>
+            <p>缩放比例: <span id="scaleRatio" class="font-medium"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-500"
+      >
+        <p>适用于ComfyUI等AI绘图工具的分辨率设置</p>
+      </div>
+    </div>
+
+    <script>
+      // 获取DOM元素
+      const inputWidth = document.getElementById("inputWidth");
+      const inputHeight = document.getElementById("inputHeight");
+      const outputFixed = document.getElementById("outputFixed");
+      const outputDimension = document.getElementById("outputDimension");
+      const roundInteger = document.getElementById("roundInteger");
+      const align8 = document.getElementById("align8");
+      const calculateBtn = document.getElementById("calculateBtn");
+      const resultContainer = document.getElementById("resultContainer");
+      const resultWidth = document.getElementById("resultWidth");
+      const resultHeight = document.getElementById("resultHeight");
+      const originalRatio = document.getElementById("originalRatio");
+      const scaleRatio = document.getElementById("scaleRatio");
+
+      // 处理对齐到8的倍数
+      function alignTo8(value) {
+        return Math.ceil(value / 8) * 8;
+      }
+
+      // 计算分辨率
+      function calculateResolution() {
+        // 获取输入值
+        const inW = parseFloat(inputWidth.value);
+        const inH = parseFloat(inputHeight.value);
+        const fixedVal = parseFloat(outputFixed.value);
+
+        // 验证输入
+        if (isNaN(inW) || isNaN(inH) || inW <= 0 || inH <= 0) {
+          alert("请输入有效的原始分辨率");
+          return;
+        }
+
+        if (isNaN(fixedVal) || fixedVal <= 0) {
+          alert("请输入有效的固定值");
+          return;
+        }
+
+        // 计算原始比例
+        const ratio = inW / inH;
+        originalRatio.textContent = `${ratio.toFixed(4)} (${inW}:${inH})`;
+
+        let outW, outH, scale;
+
+        // 根据选择计算输出分辨率
+        if (outputDimension.value === "height") {
+          // 固定宽度，计算高度
+          outW = fixedVal;
+          outH = outW / ratio;
+          scale = outW / inW;
+        } else {
+          // 固定高度，计算宽度
+          outH = fixedVal;
+          outW = outH * ratio;
+          scale = outH / inH;
+        }
+
+        // 处理对齐选项
+        if (align8.checked) {
+          outW = alignTo8(outW);
+          outH = alignTo8(outH);
+        } else if (roundInteger.checked) {
+          outW = Math.round(outW);
+          outH = Math.round(outH);
+        }
+
+        // 显示结果
+        resultWidth.textContent =
+          outW % 1 === 0 ? outW.toFixed(0) : outW.toFixed(6);
+        resultHeight.textContent =
+          outH % 1 === 0 ? outH.toFixed(0) : outH.toFixed(6);
+        scaleRatio.textContent = `${(scale * 100).toFixed(2)}%`;
+
+        // 显示结果容器并添加动画
+        resultContainer.classList.remove("hidden");
+        resultContainer.classList.add("animate-fadeIn");
+        setTimeout(() => {
+          resultContainer.classList.remove("animate-fadeIn");
+        }, 500);
+      }
+
+      // 添加事件监听
+      calculateBtn.addEventListener("click", calculateResolution);
+
+      // 支持回车键计算
+      [inputWidth, inputHeight, outputFixed].forEach((input) => {
+        input.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            calculateResolution();
+          }
+        });
+      });
+
+      // 示例数据填充（方便测试）
+      inputWidth.value = 1824;
+      inputHeight.value = 1080;
+      outputFixed.value = 512;
+    </script>
+  </body>
+</html>
