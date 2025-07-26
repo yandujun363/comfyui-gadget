@@ -33,17 +33,6 @@
     "tags": ["启动器", "新手友好", "整合包管理"]
   },
   {
-    "id": 4,
-    "name": "ComfyUI管理大师",
-    "description": "支持Windows系统，具备启动器、插件管理、环境依赖管理、工作流分析等功能，可一键启动/关闭ComfyUI，通过国内镜像加速下载，解决节点爆红问题",
-    "category": "utils",
-    "icon": "fa-cogs",
-    "version": "随更新迭代",
-    "author": "AI搅拌手",
-    "url": "https://www.bilibili.com/video/BV1XQokY4Ed3/",
-    "tags": ["管理工具", "依赖管理", "国内加速"]
-  },
-  {
     "id": 5,
     "name": "ComfyUI Manager",
     "description": "节点管理器，可在线安装插件，扩展ComfyUI功能，覆盖图像修复、风格迁移等复杂需求",
