@@ -280,5 +280,19 @@
       inputHeight.value = 1080;
       outputFixed.value = 512;
     </script>
+    <script type="module">
+      import AnalyticsConsent from "https://cdn.yangdujun.top/js/analytics-consent.js";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const analytics = new AnalyticsConsent({
+          umamiUrl: "https://js.yangdujun.top/script.js",
+          websiteId: "f39c09f1-a466-4319-bc7b-7e4c004be8c9",
+          theme: "auto",
+          onConsentChange: function (consent) {
+            console.log("用户选择:", consent ? "同意" : "拒绝");
+          },
+        });
+      });
+    </script>
   </body>
 </html>
